@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Centralino apriporta</string>
+    <string name="title_section1">Elenco accreditati</string>
+    <string name="title_section2">Pannello di controllo</string>
+    <string name="title_section3">Azioni recenti</string>
+    <string name="navigation_drawer_open">Apre menu a scomparsa</string>
+    <string name="navigation_drawer_close">Chiude menu a scomparsa</string>
+    <string name="action_example">Example action</string>
+    <string name="action_settings">Impostazioni</string>
+
+</resources>

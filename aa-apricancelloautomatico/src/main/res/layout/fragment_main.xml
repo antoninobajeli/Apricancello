@@ -1,0 +1,109 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/white"
+    tools:context=".MainActivity$PlaceholderFragment">
+
+    <TextView android:text="@string/rangestatus" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rangeStatusLbl" />
+
+    <TextView android:text="@string/rangestatus" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rangeStatus"
+        android:layout_alignTop="@+id/rangeStatusLbl"
+        android:layout_alignParentEnd="true" />
+
+    <TextView android:text="@string/last_auto_internet_call" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rangeStatusLbl"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="52dp"
+        android:id="@+id/lastOperationLbl" />
+
+
+    <TextView
+        android:text="@string/last_auto_internet_call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lastOperation"
+        android:layout_alignTop="@+id/lastOperationLbl"
+        android:layout_alignParentEnd="true" />
+
+    <TextView android:text="@string/last_position_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lastOperationLbl"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="52dp"
+        android:id="@+id/currentPositionLbl" />
+
+
+
+    <TextView
+        android:text="@string/last_position_lat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/currentPositionLat"
+        android:layout_alignTop="@+id/currentPositionLbl"
+        android:layout_centerHorizontal="true" />
+
+
+    <TextView
+        android:text="@string/last_position_long"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/currentPositionLong"
+        android:layout_alignTop="@+id/currentPositionLbl"
+        android:layout_alignEnd="@+id/rangeStatus" />
+
+
+    <TextView android:text="Distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/currentPositionLbl"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="52dp"
+        android:id="@+id/distanceLbl" />
+
+
+
+    <TextView
+        android:text="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/distance"
+        android:layout_alignTop="@+id/distanceLbl"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:text="Force request to open through internet"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/buttonSendEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:text="Send position by email"
+        android:layout_marginTop="68dp"
+        android:layout_below="@+id/button1"
+        android:layout_toStartOf="@+id/rangeStatus" />
+
+    <ToggleButton
+        android:id="@+id/buttonStartStopFakePos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Fake position ON"
+        android:textOff="Fake position OFF"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
