@@ -6,9 +6,10 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -24,17 +25,57 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".ServiceReceiver">
+
+
+        <!-- BroadcastReceiver that listens for incoming SMS messages -->
+        <!-- Note the use of android:enabled that is linked to a bool. This will mean this receiver
+             is enabled on preKitKat devices -->
+        <receiver android:name=".ServiceReceiver"
+            android:enabled="@bool/preKitKat">
+            <!-- Pre-KitKat SMS received action -->
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+
+        <!-- BroadcastReceiver that listens for incoming SMS messages -->
+        <!-- Note the use of android:enabled that is linked to a bool. This will mean this receiver
+             is enabled on KitKat devices and above -->
+        <receiver android:name=".ServiceReceiverKK"
+            android:enabled="@bool/hasKitKat"
+            android:permission="android.permission.BROADCAST_SMS">
+            <!-- KitKat+ SMS received action -->
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+            </intent-filter>
+        </receiver>
+
+        <!--receiver android:name=".ServiceReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.intent.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver-->
+
+
+
+
 
         <receiver android:name=".LocationReceiver">
             <intent-filter>
                 <action android:name="ACTION_PROXIMITY_ALERT" />
             </intent-filter>
         </receiver>
+
+
+
+
+
+
+
 
     </application>
 

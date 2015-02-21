@@ -249,6 +249,9 @@ public class MainActivity
 
 
 
+
+
+
     /**Link to the actuator giving the command to close and open/circuit
      *
      * */
@@ -427,6 +430,10 @@ public class MainActivity
 
 
 
+
+
+
+
     public void aggiornna_dati(final String s){
 
         runOnUiThread(new Runnable() {
@@ -450,6 +457,17 @@ public class MainActivity
         });
     }
 
+
+
+
+
+
+
+    /*
+    * Comunicazione HTTP con il server per il reperimento dei dati
+    *
+    *
+    * */
     private class GetWhiteList extends AsyncTask<String, Void, String> {
 
         @Override
