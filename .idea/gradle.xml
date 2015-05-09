@@ -6,15 +6,17 @@
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-2.2.1" />
+        <option name="gradleJvm" value="1.7" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/aa-apricancelloautomatico" />
+            <option value="$PROJECT_DIR$/abracadabra" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/beaconcadabra" />
           </set>
         </option>
       </GradleProjectSettings>
     </option>
   </component>
 </project>
-

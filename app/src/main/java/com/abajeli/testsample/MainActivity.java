@@ -86,6 +86,7 @@ public class MainActivity
 
     private  static ArrayList<String> mWlArrListNumbers = new ArrayList<String>();
     private  static List<Map<String, String>> mCursorList = new ArrayList<Map<String,String>>();
+
     private static SimpleAdapter mCrsAdapter;
     private static ListView mLv;
     //private static ArrayAdapter<String> mArrAdp;
@@ -101,15 +102,10 @@ public class MainActivity
      */
 
 
+
+
     public static String TAG = "MainAct";
     static int REQUEST_ENABLE_BT=2;
-    //static String WHITELIST_URL     ="http://www.bajeli.com/app/condominial/getJsonWhiteList.php";
-    static String WHITELIST_URL     ="http://www.bajeli.com/app/condominial/json-Services.php?serviceName=getWhiteList";
-
-    static String CHECKFOROPEN_URL  ="http://www.bajeli.com/app/condominial/getForOpen.php?requester=master";
-
-
-
 
     static BluetoothAdapter mBluetoothAdapter;
     //public static UUID  APRIPORTA_UUID =new UUID("00001101-0000-1000-8000-00805f9b34fb");
@@ -356,7 +352,7 @@ public class MainActivity
             httpclient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, CONNECTION_TIMEOUT); // in ms
             httpclient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, SO_TIMEOUT);// in ms
 
-            HttpGet httppost = new HttpGet(CHECKFOROPEN_URL);
+            HttpGet httppost = new HttpGet("http://www.bajeli.com/app/gateopener/getForOpen.php?requester=master");
             // Depends on your web service
             httppost.setHeader("Content-type", "application/json");
 
@@ -486,7 +482,8 @@ public class MainActivity
             httpclient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, CONNECTION_TIMEOUT); // in ms
             httpclient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, SO_TIMEOUT);// in ms
 
-            HttpPost httppost = new HttpPost(WHITELIST_URL);
+            //HttpPost httppost = new HttpPost("http://www.bajeli.com/app/gateopener/getJsonWhiteList.php");
+            HttpPost httppost = new HttpPost("http://www.condominial.it/condominial/json-Services.php?serviceName=getWhiteList");
             // Depends on your web service
             httppost.setHeader("Content-type", "application/json");
 
@@ -571,7 +568,6 @@ public class MainActivity
 
                 }
             }
-
             Long endTime = System.currentTimeMillis();
             System.out.println("RefreshOperation :: time elapsed :: " + (endTime-startTime));
             return operationResult;
@@ -699,7 +695,7 @@ public class MainActivity
                         String[] keys = {"name","tel"};
                         int[] widgetIds = {android.R.id.text1, android.R.id.text2};
 
-                        SimpleAdapter mCrsAdapter = new SimpleAdapter(rootView.getContext(),mCursorList,android.R.layout.simple_list_item_2, keys,widgetIds);
+                        mCrsAdapter = new SimpleAdapter(rootView.getContext(),mCursorList,android.R.layout.simple_list_item_2, keys,widgetIds);
                         //mArrAdp=new ArrayAdapter<String>(rootView.getContext(), android.R.layout.simple_list_item_2 ,android.R.id.text1 , mWlArrListNames );
                         mLv.setAdapter(mCrsAdapter);
                     }

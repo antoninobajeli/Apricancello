@@ -12,9 +12,11 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -28,12 +30,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.os.Build;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.MonitorNotifier;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -46,13 +58,21 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.TimerTask;
 
+import android.media.AudioTrack;
+import android.media.AudioManager;
+import android.media.AudioFormat;
+
+import com.abajeli.aa_apricancelloautomatico.BT.BTMain;
 
 public class MainActivity extends ActionBarActivity
-        implements  LocationListener{
+        implements  LocationListener, TextToSpeech.OnInitListener, BeaconConsumer {
 
+        protected static final String TAG = "RangingActivity";
+        //private IBeaconManager iBeaconManager = IBeaconManager.getInstanceForApplication(this);
 
     private static final int CONNECTION_TIMEOUT=5000;
     private static final int SO_TIMEOUT=7000;
@@ -68,9 +88,10 @@ public class MainActivity extends ActionBarActivity
 
     LocationManager locationManager;
     static Context ctx;
-
+    public static Context baseContext;
     static TextToSpeech ttobj;
     static TextView lastUpdate;
+    //static BTMain btMain=new BTMain();
 
     public static Activity activity;
 
@@ -84,9 +105,145 @@ public class MainActivity extends ActionBarActivity
 
     private int mInterval = 5000; // 5 seconds by default, can be changed later
     private Handler mHandlerRepetingTask;
+
+
+
+
+
+    private BeaconManager beaconManager;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        beaconManager.unbind(this);
+    }
+
+    long previousOpenedTime=0;
+    double minDistToOppen=0.05;
+    long minPeriodBeetwenOpen=4000;
+    @Override
+    public void onBeaconServiceConnect() {
+        beaconManager.setRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0) {
+                    double distance= beacons.iterator().next().getDistance();
+                    Log.i(TAG, "The first beacon I see is about "+distance+" meters away.");
+
+                    if ((distance < minDistToOppen) && ((SystemClock.uptimeMillis()-previousOpenedTime)>minPeriodBeetwenOpen)){
+                        Log.i(TAG, "The first beacon I see is about "+distance+" meters away."+(SystemClock.uptimeMillis()-previousOpenedTime));
+                        previousOpenedTime=SystemClock.uptimeMillis(); // to avoid too fast opened ratio
+                        BTMain btMain=new BTMain();
+                        //btMain.startCommunication();
+                    }
+
+                }
+            }
+        });
+
+
+
+        beaconManager.setMonitorNotifier(new MonitorNotifier() {
+            @Override
+            public void didEnterRegion(Region region) {
+
+                Log.i(TAG, "I just saw an beacon for the first time!");
+                //try {
+                //beaconManager.startRangingBeaconsInRegion(region);
+                //} catch (RemoteException e) {    }
+            }
+
+            @Override
+            public void didExitRegion(Region region) {
+                Log.i(TAG, "I no longer see an beacon");
+            }
+
+            @Override
+            public void didDetermineStateForRegion(int state, Region region) {
+                Log.i(TAG, "I have just switched from seeing/not seeing beacons: " + state);
+            }
+        });
+
+        try {
+
+            //beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+            beaconManager.startRangingBeaconsInRegion(new Region("com.abajeli.aa_apricancelloautomatico.boostrapRegion",
+                    Identifier.parse("f8869d30-e2e4-11e4-b571-0800200c9a66"), Identifier.parse("1"), Identifier.parse("1")));
+        } catch (RemoteException e) {    }
+
+        /*try {
+            //beaconManager.startMonitoringBeaconsInRegion(new Region("f8869d30-e2e4-11e4-b571-0800200c9a66", null, null, null));
+            beaconManager.startMonitoringBeaconsInRegion(new Region("com.abajeli.aa_apricancelloautomatico.boostrapRegion",
+                    Identifier.parse("f8869d30-e2e4-11e4-b571-0800200c9a66"), Identifier.parse("1"), Identifier.parse("1")));
+        } catch (RemoteException e) {    }*/
+    }
+
+
+
+
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = ttobj.setLanguage(Locale.ITALIAN);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+                speakOut();
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+
+    private void speakOut() {
+        System.out.println("Speaking");
+        ttobj.speak("Animal", TextToSpeech.QUEUE_FLUSH, null);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        baseContext=this.getApplication().getBaseContext();
+/*
+        ttobj=new TextToSpeech(getApplicationContext(),
+                new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if(status != TextToSpeech.ERROR){
+                            ttobj.setLanguage(Locale.ITALIAN);
+                        }
+                    }
+                });*/
+
+        setContentView(R.layout.activity_monitor);
+        //iBeaconManager.bind(this);
+
+
+
+        beaconManager = BeaconManager.getInstanceForApplication(this);
+
+        beaconManager.bind(this);
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25")); // setBeaconLayout("m:2-3=aabb,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
+        //beaconManager.setForegroundScanPeriod(30000);
+        beaconManager.setBackgroundBetweenScanPeriod(3000);
+        beaconManager.setForegroundBetweenScanPeriod(3000);
+        beaconManager.setBackgroundScanPeriod(2000);
+        beaconManager.setForegroundScanPeriod(2000);
+
+        beaconManager.setDebug(true);
+
+
+    }
+
+
+    protected void onCreateBck(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
         ctx=this.getApplicationContext();
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
@@ -179,7 +336,12 @@ public class MainActivity extends ActionBarActivity
 
     }
 
-private static int ciclicPosition=0;
+
+
+
+
+
+    private static int ciclicPosition=0;
     Runnable mStatusChecker = new Runnable() {
         @Override
         public void run() {
@@ -215,6 +377,51 @@ private static int ciclicPosition=0;
             mHandlerRepetingTask.postDelayed(mStatusChecker, mInterval);
         }
     };
+
+
+
+
+
+
+/*
+    @Override
+    public void onIBeaconServiceConnect() {
+        iBeaconManager.setMonitorNotifier(new MonitorNotifier() {
+            @Override
+            public void didEnterRegion(Region region) {
+                Log.i(TAG, "I just saw an iBeacon for the firt time!");
+            }
+
+            @Override
+            public void didExitRegion(Region region) {
+                Log.i(TAG, "I no longer see an iBeacon");
+            }
+
+            @Override
+            public void didDetermineStateForRegion(int state, Region region) {
+                Log.i(TAG, "I have just switched from seeing/not seeing iBeacons: "+state);
+            }
+        });
+
+        iBeaconManager.setRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<IBeacon> iBeacons, Region region) {
+                if (iBeacons.size() > 0) {
+                    Log.i(TAG, "The first iBeacon I see is about "+iBeacons.iterator().next().getAccuracy()+" meters away.");
+
+                }
+            }
+        });
+
+        try {
+            iBeaconManager.startMonitoringBeaconsInRegion(new Region("f8869d30-e2e4-11e4-b571-0800200c9a66", null, 1, 1));
+        } catch (RemoteException e) {   }
+    }
+
+
+*/
+
+
 
     void startRepeatingTask() {
         mStatusChecker.run();
@@ -483,8 +690,31 @@ private static int ciclicPosition=0;
     }
 
 
+
+
+
+    public static void openGate(){
+        //btMain.startCommunication();
+    }
+
+
+
+
+
     public static void parla(String txt){
-        ttobj.speak(txt, TextToSpeech.QUEUE_FLUSH, null);
+        //ttobj.speak(txt, TextToSpeech.QUEUE_FLUSH, null);
+
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(baseContext, notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+
     }
 
     public void aggiornna_dati(final String s){
@@ -522,6 +752,7 @@ private static int ciclicPosition=0;
         }
         super.onPause();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -637,6 +868,118 @@ private static int ciclicPosition=0;
         startActivity(Intent.createChooser(intent, "Send Email"));
     }
 
+
+
+
+
+    //private final double freqOfTone = 440; // hz
+
+    private EditText tfTone;
+
+    byte[] genToneold(double freqOfTone,int sampleRate){
+        final double duration = 1; // seconds
+        //final int sampleRate = 40000;
+        final int numSamples =(int)(duration * sampleRate);
+        double sample[]= new double[numSamples];
+        byte generatedSnd[] = new byte[2 * numSamples];
+
+        for (int i = 0; i < numSamples-1; ++i) {      // Fill the sample array
+            sample[i] = Math.sin(freqOfTone * 2 * Math.PI * i / (sampleRate));
+        }
+
+/*
+        // fill out the array
+        for (int i = 0; i < numSamples; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+        }*/
+
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        for (final double dVal : sample) {
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+        }
+        return generatedSnd;
+    }
+
+
+    byte[] genTone(){
+        final double duration = 1; // seconds
+        //final int sampleRate = 40000;
+        final int numSamples =(int)(duration * 48000);
+        double sample[]= new double[numSamples];
+        byte generatedSnd[] = new byte[2 * numSamples];
+
+
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        while(idx<2 * numSamples){
+            // scale to maximum amplitude
+            short val = (short) (( 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+            val = (short) (( 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+/*
+           val = (short) (( 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+   */
+            val = (short) (( -32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+            val = (short) (( -32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+
+/*
+
+            val = (short) (( 0));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);*/
+
+
+        }
+
+
+        return generatedSnd;
+    }
+
+
+    private void sendToneCode(double freqOfTone,int sampleRate){
+
+        byte generatedSnd[] = genTone();
+
+        int minSize =AudioTrack.getMinBufferSize( sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT );
+        Log.i("audio","minbuffSize="+minSize);
+        Log.i("audio","generatedSnd="+generatedSnd.length);
+        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                sampleRate, AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
+                AudioTrack.MODE_STATIC);
+        audioTrack.write(generatedSnd, 0, generatedSnd.length);
+        audioTrack.play();
+    }
+
+
+
+
     TextView tvLat,tvLong,tvDist;
 
     @Override
@@ -661,6 +1004,18 @@ private static int ciclicPosition=0;
 
         public PlaceholderFragment() {
         }
+        EditText etTone;
+
+        //final Runnable beeper = new Runnable() {
+         //   public void run() {
+                //((MainActivity) activity).sendToneCode(19000, 38000);
+
+                //((MainActivity) activity).sendToneCode(20000, 40000);
+
+                //((MainActivity) activity).sendToneCode(15000, 30000);
+         //   }
+         //   };
+
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -683,6 +1038,30 @@ private static int ciclicPosition=0;
                 @Override
                 public void onClick(View v) {
                     ((MainActivity) activity).sendEmail();
+                }
+            });
+
+
+            Button sendETone= (Button) rootView.findViewById(R.id.buttonSendToneCode);
+            etTone=(EditText) rootView.findViewById(R.id.tfTone);
+            sendETone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //((MainActivity) activity).sendToneCode(15000, 20000);// PAZZESCO
+                    ((MainActivity) activity).sendToneCode(19000, 48000);
+                    //ToneGenerator toneGenerator;
+                    //new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                }
+            });
+
+
+            Button sendBTCommand= (Button) rootView.findViewById(R.id.btnBTOpen);
+            sendBTCommand.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    BTMain btMain=new BTMain();
+
                 }
             });
 

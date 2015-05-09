@@ -75,7 +75,7 @@ public class ServiceReceiver extends BroadcastReceiver {
                                 httpclient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, CONNECTION_TIMEOUT); // in ms
                                 httpclient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, SO_TIMEOUT);// in ms
 
-                                HttpGet httppost = new HttpGet("http://www.bajeli.com/app/condominial/json-Services.php?serviceName=confirmCellNumber&number="+URLEncoder.encode(cellNumb,"UTF-8")+"&code="+verificationCode);
+                                HttpGet httppost = new HttpGet("http://www.condominial.it/condominial/json-Services.php?serviceName=confirmCellNumber&number="+URLEncoder.encode(cellNumb,"UTF-8")+"&code="+verificationCode);
                                 // Depends on your web service
                                 httppost.setHeader("Content-type", "application/json");
 

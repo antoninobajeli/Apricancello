@@ -92,11 +92,43 @@
         android:id="@+id/buttonSendEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="35dp"
+        android:layout_marginStart="35dp"
         android:text="Send position by email"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="25dp"
         android:layout_below="@+id/button1"
         android:layout_toStartOf="@+id/rangeStatus" />
+
+    <Button
+        android:id="@+id/buttonSendToneCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:text="Send toneCode"
+        android:layout_below="@+id/buttonSendEmail"
+        android:layout_alignStart="@+id/button1"/>
+
+    <EditText
+        android:id="@+id/tfTone"
+        android:inputType="number"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:text="444"
+        android:layout_below="@+id/buttonSendEmail"
+        android:layout_alignEnd="@+id/button1"/>
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Gate"
+            android:id="@+id/btnBTOpen"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="false"
+            android:layout_below="@+id/tfTone"
+            android:minWidth="300dp"
+            android:minHeight="72dp" />
+
 
     <ToggleButton
         android:id="@+id/buttonStartStopFakePos"

@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Apricancello.iml" filepath="$PROJECT_DIR$/Apricancello.iml" />
       <module fileurl="file://$PROJECT_DIR$/TestSample.iml" filepath="$PROJECT_DIR$/TestSample.iml" />
       <module fileurl="file://$PROJECT_DIR$/aa-apricancelloautomatico/aa-apricancelloautomatico.iml" filepath="$PROJECT_DIR$/aa-apricancelloautomatico/aa-apricancelloautomatico.iml" />
+      <module fileurl="file://$PROJECT_DIR$/abracadabra/abracadabra.iml" filepath="$PROJECT_DIR$/abracadabra/abracadabra.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/beaconcadabra/beaconcadabra.iml" filepath="$PROJECT_DIR$/beaconcadabra/beaconcadabra.iml" />
     </modules>
   </component>
 </project>
-
