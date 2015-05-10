@@ -1,1 +1,1 @@
-include ':app', ':aa-apricancelloautomatico', ':abracadabra', ':beaconcadabra'
+include ':app', ':aa-apricancelloautomatico', ':abracadabra', ':beaconcadabra', ':gesturecadabra'

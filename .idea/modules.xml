@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/abracadabra/abracadabra.iml" filepath="$PROJECT_DIR$/abracadabra/abracadabra.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/beaconcadabra/beaconcadabra.iml" filepath="$PROJECT_DIR$/beaconcadabra/beaconcadabra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gesturecadabra/gesturecadabra.iml" filepath="$PROJECT_DIR$/gesturecadabra/gesturecadabra.iml" />
     </modules>
   </component>
 </project>
